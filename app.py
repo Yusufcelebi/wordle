@@ -291,9 +291,28 @@ st.markdown('<div class="baslik">🧙 BÜYÜLÜ WORDLE</div>', unsafe_allow_html
 st.markdown('<div class="altbaslik">5 HARFLİ KELİMEYİ BUL</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="xp-bar">✨ XP: {st.session_state.xp:.2f}</div>', unsafe_allow_html=True)
 
+VEDA_LAFLAR = [
+    "Paranı öyle hızlı çarçur etme evlat...",
+    "Harcarken kolay, kazanırken zor. Düşün biraz.",
+    "Görüşürüz... belki.",
+    "XP'siz büyücü istemem. Elveda.",
+    "Tekrar zengin olunca gel.",
+]
+
 # ── Amca göster ────────────────────────────────────────────────────────────────
 xp = st.session_state.xp
 amca_gorunsun = xp >= 10
+
+# Amca yeni kayboldu mu?
+if "amca_onceki_gorunum" not in st.session_state:
+    st.session_state.amca_onceki_gorunum = False
+
+amca_yeni_kayboldu = st.session_state.amca_onceki_gorunum and not amca_gorunsun
+if amca_yeni_kayboldu:
+    st.session_state.veda_mesaji = random.choice(VEDA_LAFLAR)
+elif amca_gorunsun:
+    st.session_state.veda_mesaji = ""
+st.session_state.amca_onceki_gorunum = amca_gorunsun
 
 if amca_gorunsun:
     col_bos, col_amca, col_bos2 = st.columns([2, 1, 2])
@@ -303,6 +322,10 @@ if amca_gorunsun:
 
     if st.session_state.amca_laf:
         st.markdown(f'<div class="amca-laf">"{st.session_state.amca_laf}"</div>', unsafe_allow_html=True)
+
+# Veda mesajı — amca gidince
+if not amca_gorunsun and st.session_state.get("veda_mesaji"):
+    st.markdown(f'<div class="amca-laf" style="color:#666;font-size:0.8rem;">🧙 "{st.session_state.veda_mesaji}"</div>', unsafe_allow_html=True)
 
     # Teklif kutusu
     if st.session_state.teklif_goster and st.session_state.teklif and not st.session_state.teklif_kabul and not st.session_state.oyun_bitti:
