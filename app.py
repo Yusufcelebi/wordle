@@ -235,22 +235,30 @@ def amca_svg(renk: str = "normal") -> str:
 # ── XP hesaplama ───────────────────────────────────────────────────────────────
 def xp_hesapla(tahmin, gizli, sonuc, onceki_puan_alan):
     """
-    onceki_puan_alan: set of (harf, konum, renk) — daha önce puan almış kombinasyonlar
+    Puan alma kuralları:
+    - Sarı (yakin): +0.25 — ama daha önce aynı harf aynı konumda sarı veya yeşil puan almışsa sıfır
+    - Yeşil (dogru): +0.50 — ama daha önce aynı harf aynı konumda yeşil puan almışsa sıfır
+    - Sarı→Yeşil: toplamda 0.75 (0.25 + 0.50)
+    - Yeşil→Sarı: 0 (yeşil zaten en yüksek, geri gidince puan yok)
     """
-    kazan = 1.0  # her tahmin +1
+    kazan = 1.0
     yeni_puan_alan = set()
 
     for i, (harf, durum) in enumerate(zip(tahmin, sonuc)):
         anahtar_yesil = (harf, i, "dogru")
         anahtar_sari  = (harf, i, "yakin")
 
-        if durum == "dogru" and anahtar_yesil not in onceki_puan_alan:
-            kazan += 0.5
-            yeni_puan_alan.add(anahtar_yesil)
-        elif durum == "yakin" and anahtar_sari not in onceki_puan_alan:
-            # sarının daha önce aynı harfi başka yerde yeşil yapmadıysa
-            kazan += 0.25
-            yeni_puan_alan.add(anahtar_sari)
+        if durum == "dogru":
+            # Daha önce bu konumda yeşil puan almamışsa +0.50
+            if anahtar_yesil not in onceki_puan_alan:
+                kazan += 0.5
+                yeni_puan_alan.add(anahtar_yesil)
+        elif durum == "yakin":
+            # Daha önce bu konumda sarı VEYA yeşil puan almamışsa +0.25
+            # (yeşil→sarı durumunda hiç puan yok)
+            if anahtar_sari not in onceki_puan_alan and anahtar_yesil not in onceki_puan_alan:
+                kazan += 0.25
+                yeni_puan_alan.add(anahtar_sari)
 
     return kazan, yeni_puan_alan
 
@@ -368,7 +376,10 @@ if st.session_state.oyun_bitti:
 
 # ── Giriş ──────────────────────────────────────────────────────────────────────
 def normalize(s):
-    return s.lower().replace("İ","i").replace("I","ı")
+    # Türkçe büyük/küçük harf dönüşümü — standart lower() İ→i ve I→i yapar, biz düzeltiyoruz
+    s = s.replace("İ", "i").replace("I", "ı").replace("Ş", "ş").replace("Ğ", "ğ")
+    s = s.replace("Ü", "ü").replace("Ö", "ö").replace("Ç", "ç")
+    return s.lower()
 
 def degerlendir(tahmin, gizli):
     sonuc = ["yanlis"] * 5
