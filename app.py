@@ -311,7 +311,7 @@ if amca_gorunsun:
         st.markdown(f"""
         <div class="teklif-kutu">
             <div class="teklif-baslik">🔮 TEKLİF</div>
-            <div class="teklif-metin">{t['mesaj']}</div>
+            <div class="teklif-metin">Bir bilgi sahibiyim... Satın almak ister misin?</div>
             <div class="teklif-ucret">Bedel: {ucret} XP</div>
         </div>
         """, unsafe_allow_html=True)
@@ -445,6 +445,9 @@ if not st.session_state.oyun_bitti:
         elif not tahmin.isalpha():
             st.session_state.hata = "⚠️ Sadece harf kullan!"
             st.rerun()
+        elif tahmin in st.session_state.tahminler:
+            st.session_state.hata = "⚠️ Bu kelimeyi zaten denedin!"
+            st.rerun()
         else:
             st.session_state.hata = ""
             gizli = st.session_state.gizli
@@ -519,15 +522,17 @@ if not st.session_state.oyun_bitti:
 # ── Klavye ─────────────────────────────────────────────────────────────────────
 KB = [
     ["e","r","t","y","u","ı","o","p","ğ","ü"],
-    ["a","s","d","f","g","h","j","k","l","ş","i"],
-    ["z","x","c","v","b","n","m","ö","ç"],
+    ["a","s","d","f","g","h","j","k","l","ş"],
+    ["z","x","c","v","b","n","m","ö","ç","i","İ"],
 ]
 klavye_html = '<div class="klavye">'
 for satir in KB:
     klavye_html += '<div class="klavye-satir">'
     for harf in satir:
-        durum = st.session_state.klavye.get(harf, "")
-        klavye_html += f'<div class="tus {durum}">{harf.upper()}</div>'
+        arama = "i" if harf == "İ" else harf
+        durum = st.session_state.klavye.get(arama, "")
+        goster = "İ" if harf == "İ" else harf.upper()
+        klavye_html += f'<div class="tus {durum}">{goster}</div>'
     klavye_html += '</div>'
 klavye_html += '</div>'
 st.markdown(klavye_html, unsafe_allow_html=True)
