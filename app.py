@@ -327,46 +327,45 @@ if amca_gorunsun:
 if not amca_gorunsun and st.session_state.get("veda_mesaji"):
     st.markdown(f'<div class="amca-laf" style="color:#666;font-size:0.8rem;">🧙 "{st.session_state.veda_mesaji}"</div>', unsafe_allow_html=True)
 
-    # Teklif kutusu
-    if st.session_state.teklif_goster and st.session_state.teklif and not st.session_state.teklif_kabul and not st.session_state.oyun_bitti:
-        t = st.session_state.teklif
-        ucret = len(st.session_state.tahminler) + 1
-        st.markdown(f"""
-        <div class="teklif-kutu">
-            <div class="teklif-baslik">🔮 TEKLİF</div>
-            <div class="teklif-metin">Bir bilgi sahibiyim... Satın almak ister misin?</div>
-            <div class="teklif-ucret">Bedel: {ucret} XP</div>
-        </div>
-        """, unsafe_allow_html=True)
+# Teklif kutusu
+if amca_gorunsun and st.session_state.teklif_goster and st.session_state.teklif and not st.session_state.teklif_kabul and not st.session_state.oyun_bitti:
+    t = st.session_state.teklif
+    ucret = len(st.session_state.tahminler) + 1
+    st.markdown(f"""
+    <div class="teklif-kutu">
+        <div class="teklif-baslik">🔮 TEKLİF</div>
+        <div class="teklif-metin">Bir bilgi sahibiyim... Satın almak ister misin?</div>
+        <div class="teklif-ucret">Bedel: {ucret} XP</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("✅ Kabul Et", use_container_width=True):
-                if st.session_state.xp >= ucret:
-                    st.session_state.xp -= ucret
-                    st.session_state.teklif_kabul = True
-                    st.session_state.teklif_goster = False
-                    # Blöf mü?
-                    if t["blof"]:
-                        st.session_state.amca_renk = "normal"  # kahkahayı kullanınca göstereceğiz
-                        st.session_state.amca_laf = "Al bakalım... 😈"
-                    else:
-                        st.session_state.amca_renk = "altin"
-                        st.session_state.amca_laf = f"'{t['harf'].upper()}' harfi {t['yer']+1}. sıradadır. Kullan."
-                    st.rerun()
-                else:
-                    st.session_state.hata = "⚠️ Yeterli XP yok!"
-                    st.rerun()
-        with col2:
-            if st.button("❌ Reddet", use_container_width=True):
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("✅ Kabul Et", use_container_width=True):
+            if st.session_state.xp >= ucret:
+                st.session_state.xp -= ucret
+                st.session_state.teklif_kabul = True
                 st.session_state.teklif_goster = False
                 if t["blof"]:
-                    st.session_state.amca_renk = "kopurme"
-                    st.session_state.amca_laf = "Hah! Akıllı sandın kendini..."
+                    st.session_state.amca_renk = "normal"
+                    st.session_state.amca_laf = "Al bakalım... 😈"
                 else:
-                    st.session_state.amca_renk = "kopurme"
-                    st.session_state.amca_laf = "Pişman olacaksın!"
+                    st.session_state.amca_renk = "altin"
+                    st.session_state.amca_laf = f"'{t['harf'].upper()}' harfi {t['yer']+1}. sıradadır. Kullan."
                 st.rerun()
+            else:
+                st.session_state.hata = "⚠️ Yeterli XP yok!"
+                st.rerun()
+    with col2:
+        if st.button("❌ Reddet", use_container_width=True):
+            st.session_state.teklif_goster = False
+            if t["blof"]:
+                st.session_state.amca_renk = "kopurme"
+                st.session_state.amca_laf = "Hah! Akıllı sandın kendini..."
+            else:
+                st.session_state.amca_renk = "kopurme"
+                st.session_state.amca_laf = "Senin bileceğin iş... Pişman olursun."
+            st.rerun()
 
 # ── Izgara ─────────────────────────────────────────────────────────────────────
 izgara_html = '<div class="izgara">'
